@@ -2,7 +2,8 @@ package teste;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,7 +29,8 @@ public class inicio extends JFrame{
       
 	public static void main(String[] args) {
 		//imports internos
-		discord discord = new discord();
+		discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
+		discord_pedidos discord_pedidos = new discord_pedidos();
 		conect internet = new conect();
 		controlador caixa = new controlador();
 		inicio iniciar = new inicio();
@@ -37,9 +39,12 @@ public class inicio extends JFrame{
 				acucar = null, 
 				title = "Um pedido novo foi registrado", 
 				link = "https://discord.com/api/webhooks/1101930370070499398/xZ9Ef6KNeKyaM2zW1NbVFJ0sQixY_Z00UMBMv11fwD9jZlGqMBjXb9nZwHC5t49VRS36"; 
+		LocalDateTime agora = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String horarioFormatado = agora.format(formatter);
 		//Chama interface 
 		iniciar.setVisible(true);
-		//Variáveis
+		//Variáveis 
 		boolean closeSystem = false;
 		
 		while(closeSystem != true) {
@@ -49,7 +54,7 @@ public class inicio extends JFrame{
 		 if (internet.temConexao()) {
 	            //System.out.println("Conectado à internet.");
 			 int mat = 0;
-			 if(mat == 0) {
+			 if(caixa.getNumberOperador() == 0) {
 	            mat =  Integer.parseInt(JOptionPane.showInputDialog("Matricula do operador?"));
 	    		
 	    		caixa.setNumberOperador(mat);
@@ -60,12 +65,28 @@ public class inicio extends JFrame{
 	    			if(dinheiro == 100) {
 	    				int resp = JOptionPane.showConfirmDialog(null, "O caixa será aberto para:"+caixa.getNomeOperador()+"\ncom um valor de R$"+dinheiro+"0\n deseja confimar?");
 		    			if(resp == JOptionPane.YES_OPTION) {
+		    				discord_entrada_caixa.enviarEmbed("aberura de caixa", "Abertura de caixa valor aberto: **R$"+dinheiro+"0**", "Paulo Victor", horarioFormatado, caixa.getNomeOperador());
 		    				caixa.entradaCaixa(dinheiro);
 		    				JOptionPane.showMessageDialog(null, "Dados gravados\ncaixa aberto :)");
 		    				cafe = JOptionPane.showInputDialog("Qual será o seu café?");
-		    				leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
-		    				acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
-		    				closeSystem = true;
+		    				if(cafe != null) {
+		    					leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
+		    					if(leite != null) {
+		    						acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
+		    						if(acucar != null) {
+		    							discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
+		    							 closeSystem = true;
+		    						}else {
+		    							closeSystem = false;
+		    						}
+		    					}else {
+		    						closeSystem = false;
+		    					}
+		    				}else {
+		    					closeSystem = false;
+		    				}
+		    				
+		    				
 		    			}else if(resp == JOptionPane.NO_OPTION){
 		    				closeSystem = false;
 		    			}else if(resp == JOptionPane.CLOSED_OPTION) {
@@ -80,8 +101,25 @@ public class inicio extends JFrame{
 	    				}else {
 	    					JOptionPane.showMessageDialog(null, "Operador não encontrado");
 	    				}
+	    		}else {
+	    			cafe = JOptionPane.showInputDialog("Qual será o seu café?");
+    				if(cafe != null) {
+    					leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
+    					if(leite != null) {
+    						acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
+    						if(acucar != null) {
+    							discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
+    							 closeSystem = true;
+    						}else {
+    							closeSystem = false;
+    						}
+    					}else {
+    						closeSystem = false;
+    					}
+    				}else {
+    					closeSystem = false;
+    				}
 	    		}
-	            discord.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
 	        } else {
 	            System.out.println("Sem conexão com a internet.");
 	        }
