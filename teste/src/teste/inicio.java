@@ -4,32 +4,99 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 
-
-
-public class inicio extends JFrame{
+public class inicio extends JFrame implements ActionListener{
+	public JLabel date;
+    private Timer timer;
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
 	
 	public inicio() {
-        setUndecorated(true);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);       
+		setUndecorated(true);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JPanel panelBTN = new JPanel();
+        panelBTN.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton closeButton = new JButton("X");
+        closeButton.setBackground(Color.RED);
+        closeButton.setForeground(Color.WHITE);
+        closeButton.setFocusPainted(false);
+        closeButton.setBorderPainted(false);
+        closeButton.addActionListener(e -> solicitarSenhaParaFechar());
+        
+        panelBTN.add(closeButton);
+        add(panelBTN, BorderLayout.NORTH);
 
         
+        JPanel panelDate = new JPanel();
+        panelDate.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        date = new JLabel();
+        panelDate.add(date);
+
+        add(panelDate, BorderLayout.SOUTH);
 
         
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Alt + F4 bloqueado!"); 
+            }
+        });
+        
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LocalDateTime agora = LocalDateTime.now();
+                date.setText(agora.format(formatter));
+            }
+        });
+
+        timer.start();
+	}
+	
+	private void solicitarSenhaParaFechar() {
+        int senhaCorreta = 2399;
+        while (true) {
+            String input = JOptionPane.showInputDialog("Para executar essa ação, informe a senha:");
+            if (input == null) { 
+                return;
+            }
+
+            try {
+                int senha = Integer.parseInt(input);
+                if (senha == senhaCorreta) {
+                    System.exit(0);
+                } else {
+                	 LocalDateTime agora = LocalDateTime.now();
+                	discord_entrada_caixa.enviarEmbed("Tentativa de fechar aplicação", "indetificamos que uma filial tentou fechar o PDV", "foi identificado uma senha: **"+senha+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1355352472733876402/4mmGgsPx3jTqbAN19JTEwPvEMl7xuOmMeQPINvnrArD1nlDLOUj4YFaexPIPcN-t6Xsq");
+                    JOptionPane.showMessageDialog(null, "Senha incorreta!", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 	
-	
-	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
         
       
 	public static void main(String[] args) {
 		//imports internos
-		discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
 		discord_pedidos discord_pedidos = new discord_pedidos();
 		conect internet = new conect();
 		controlador caixa = new controlador();
@@ -38,11 +105,11 @@ public class inicio extends JFrame{
 				leite = null, 
 				acucar = null, 
 				title = "Um pedido novo foi registrado", 
-				link = "https://discord.com/api/webhooks/1101930370070499398/xZ9Ef6KNeKyaM2zW1NbVFJ0sQixY_Z00UMBMv11fwD9jZlGqMBjXb9nZwHC5t49VRS36"; 
+				link = "https://discord.com/api/webhooks/1101930370070499398/xZ9Ef6KNeKyaM2zW1NbVFJ0sQixY_Z00UMBMv11fwD9jZlGqMBjXb9nZwHC5t49VRS36";
+		//Chama interface 
 		LocalDateTime agora = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        String horarioFormatado = agora.format(formatter);
-		//Chama interface 
+	    String horarioFormatado = agora.format(formatter);
 		iniciar.setVisible(true);
 		//Variáveis 
 		boolean closeSystem = false;
@@ -65,25 +132,19 @@ public class inicio extends JFrame{
 	    			if(dinheiro == 100) {
 	    				int resp = JOptionPane.showConfirmDialog(null, "O caixa será aberto para:"+caixa.getNomeOperador()+"\ncom um valor de R$"+dinheiro+"0\n deseja confimar?");
 		    			if(resp == JOptionPane.YES_OPTION) {
-		    				discord_entrada_caixa.enviarEmbed("aberura de caixa", "Abertura de caixa valor aberto: **R$"+dinheiro+"0**", "Paulo Victor", horarioFormatado, caixa.getNomeOperador());
+		    				discord_entrada_caixa.enviarEmbed("aberura de caixa", "Abertura de caixa valor aberto: **R$"+dinheiro+"0**", "Paulo Victor", horarioFormatado, caixa.getNomeOperador(), "https://discord.com/api/webhooks/1355352472733876402/4mmGgsPx3jTqbAN19JTEwPvEMl7xuOmMeQPINvnrArD1nlDLOUj4YFaexPIPcN-t6Xsq");
 		    				caixa.entradaCaixa(dinheiro);
 		    				JOptionPane.showMessageDialog(null, "Dados gravados\ncaixa aberto :)");
 		    				cafe = JOptionPane.showInputDialog("Qual será o seu café?");
-		    				if(cafe != null) {
-		    					leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
-		    					if(leite != null) {
-		    						acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
-		    						if(acucar != null) {
-		    							discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
-		    							 closeSystem = true;
-		    						}else {
-		    							closeSystem = false;
-		    						}
-		    					}else {
-		    						closeSystem = false;
-		    					}
+		    				leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
+		    				acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
+		    				if(cafe != null && leite != null && acucar != null) {
+		    				discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
+   							 closeSystem = true;
+		    				
+		    						
 		    				}else {
-		    					closeSystem = false;
+		    				closeSystem = false;
 		    				}
 		    				
 		    				
@@ -125,4 +186,8 @@ public class inicio extends JFrame{
 	        }
 	    }
 	}
+
+
+
+	
 }

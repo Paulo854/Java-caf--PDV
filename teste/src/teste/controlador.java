@@ -6,7 +6,7 @@ public class controlador {
 	
 	private static int opN;
 	private static String nome;
-	private static double money;
+	private double money;
 	
 	public controlador() {
 		

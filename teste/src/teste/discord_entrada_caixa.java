@@ -5,9 +5,9 @@ import java.net.URL;
 
 public class discord_entrada_caixa {
 	
-	 public static void enviarEmbed(String titulo, String tipoAcao, String responsavel, String horario, String rodape) {
+	 public static void enviarEmbed(String titulo, String tipoAcao, String responsavel, String horario, String rodape, String link) {
 	        try {
-	            URL url = new URL("https://discord.com/api/webhooks/1355352472733876402/4mmGgsPx3jTqbAN19JTEwPvEMl7xuOmMeQPINvnrArD1nlDLOUj4YFaexPIPcN-t6Xsq");
+	            URL url = new URL(link);
 	            HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
 	            conexao.setRequestMethod("POST");
 	            conexao.setRequestProperty("Content-Type", "application/json");
