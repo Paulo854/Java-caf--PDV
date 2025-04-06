@@ -9,6 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.*;
+import java.awt.image.*;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 
 public class inicio extends JFrame implements ActionListener{
@@ -20,7 +23,9 @@ public class inicio extends JFrame implements ActionListener{
 	
 	public inicio() {
 		setUndecorated(true);
+		setBackground(Color.black);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -52,8 +57,16 @@ public class inicio extends JFrame implements ActionListener{
         formuser.setLayout(new FlowLayout(FlowLayout.CENTER));
         
         logoIcon = new JLabel();
-        logoIcon.setIcon(new ImageIcon(getClass().getResource("logo1.png")));
-        
+        try {
+            // Carrega e redimensiona a imagem
+        	 BufferedImage img = ImageIO.read(inicio.class.getResource("logo1.png"));
+            Image scaledImg = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH); // muda o tamanho aqui
+            logoIcon.setIcon(new ImageIcon(scaledImg));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+            
+   
 
         formuser.add(logoIcon);
         
