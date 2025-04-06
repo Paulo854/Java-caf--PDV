@@ -17,19 +17,26 @@ import java.io.IOException;
 public class inicio extends JFrame implements ActionListener{
 	public JLabel date;
 	public JLabel logoIcon;
+	public JLabel lblLogin;
+	public JTextField txtLogin;
+	public JLabel lblSenha;
+	public JPasswordField txtSenha;
     public Timer timer;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
 	
 	public inicio() {
+		
 		setUndecorated(true);
 		setBackground(Color.black);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        
         JPanel panelBTN = new JPanel();
         panelBTN.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -51,26 +58,83 @@ public class inicio extends JFrame implements ActionListener{
         panelDate.add(date);
 
         add(panelDate, BorderLayout.SOUTH);
+        
+        
+        // Painel central que vai conter a logo e o txtLogin centralizados
+        JPanel centro = new JPanel(new GridBagLayout()); // Centraliza conteúdo
+        centro.setOpaque(false); // Fundo transparente pra aparecer o fundo da tela
 
-        
-        JPanel formuser = new JPanel();
-        formuser.setLayout(new FlowLayout(FlowLayout.CENTER));
-        
+        // Painel interno com logo
+        JPanel iconPanel = new JPanel();
+        iconPanel.setLayout(new BoxLayout(iconPanel, BoxLayout.X_AXIS));
+        iconPanel.setOpaque(false);
+
+        // Logo
         logoIcon = new JLabel();
-        try {
-            // Carrega e redimensiona a imagem
-        	 BufferedImage img = ImageIO.read(inicio.class.getResource("logo1.png"));
-            Image scaledImg = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH); // muda o tamanho aqui
-            logoIcon.setIcon(new ImageIcon(scaledImg));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-            
-   
+        ImageIcon icon = new ImageIcon(getClass().getResource("logo1.png"));
 
-        formuser.add(logoIcon);
+        // Redimensiona a imagem, se necessário
+        Image img = icon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        logoIcon.setIcon(new ImageIcon(img));
+        logoIcon.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        add(formuser, BorderLayout.CENTER);
+        // configurações de deslocamento dos campos de input
+        GridBagConstraints info = new GridBagConstraints();
+        info.insets = new Insets(0, 50, 0, 0); // top, left, bottom, right
+        
+        // Painel interno com login e senha
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setOpaque(false);
+        
+        // Painel interno com login
+        JPanel loginPanel = new JPanel();
+        loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.X_AXIS));
+        loginPanel.setOpaque(false);
+        
+        // Campo de login
+        lblLogin = new JLabel();
+        lblLogin.setText("LOGIN: ");
+        lblLogin.setFont(new Font("Arial", Font.BOLD, 20));
+
+        txtLogin = new JTextField(20);
+        txtLogin.setMaximumSize(new Dimension(200, 30)); // Limita o tamanho
+        txtLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Painel interno com senha
+        JPanel senhaPanel = new JPanel();
+        senhaPanel.setLayout(new BoxLayout(senhaPanel, BoxLayout.X_AXIS));
+        senhaPanel.setOpaque(false);
+        
+        // Campo de senha
+        lblSenha = new JLabel();
+        lblSenha.setText("SENHA: ");
+        lblSenha.setFont(new Font("Arial", Font.BOLD, 20));
+
+        txtSenha = new JPasswordField();
+        txtSenha.setMaximumSize(new Dimension(200, 30)); // Limita o tamanho
+        txtSenha.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+
+        // Adiciona aos painéis criados
+        iconPanel.add(logoIcon);
+        //iconPanel.add(Box.createHorizontalStrut(20)); // Espaço entre logo e input
+        loginPanel.add(lblLogin);
+        loginPanel.add(txtLogin);
+        senhaPanel.add(lblSenha);
+        senhaPanel.add(txtSenha);
+        infoPanel.add(loginPanel);
+        infoPanel.add(senhaPanel);
+
+        // Adiciona ao centro com GridBagConstraints para centralizar
+        centro.add(iconPanel, new GridBagConstraints());
+        centro.add(infoPanel, info);
+        infoPanel.add(Box.createVerticalStrut(20)); // Espaço entre logo e input
+
+        // Adiciona o painel central à janela
+        add(centro, BorderLayout.CENTER);
+
+        setVisible(true);
         
         addWindowListener(new WindowAdapter() {
             @Override
