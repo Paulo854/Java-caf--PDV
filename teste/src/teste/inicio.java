@@ -13,7 +13,8 @@ import java.awt.event.*;
 
 public class inicio extends JFrame implements ActionListener{
 	public JLabel date;
-    private Timer timer;
+	public JLabel logoIcon;
+    public Timer timer;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
 	
@@ -46,6 +47,17 @@ public class inicio extends JFrame implements ActionListener{
 
         add(panelDate, BorderLayout.SOUTH);
 
+        
+        JPanel formuser = new JPanel();
+        formuser.setLayout(new FlowLayout(FlowLayout.CENTER));
+        
+        logoIcon = new JLabel();
+        logoIcon.setIcon(new ImageIcon(getClass().getResource("logo1.png")));
+        
+
+        formuser.add(logoIcon);
+        
+        add(formuser, BorderLayout.CENTER);
         
         addWindowListener(new WindowAdapter() {
             @Override
@@ -155,12 +167,14 @@ public class inicio extends JFrame implements ActionListener{
 		    			}else if(resp == JOptionPane.CANCEL_OPTION) {
 		    				closeSystem = false;
 		    			}
-		    			
+		    				
 		    				}else {
 		    					JOptionPane.showMessageDialog(null, "O lastro do caixa deve ser R$100,00");
+		    					closeSystem = false;
 		    				} 
 	    				}else {
 	    					JOptionPane.showMessageDialog(null, "Operador não encontrado");
+	    					closeSystem = false;
 	    				}
 	    		}else {
 	    			cafe = JOptionPane.showInputDialog("Qual será o seu café?");
@@ -183,6 +197,7 @@ public class inicio extends JFrame implements ActionListener{
 	    		}
 	        } else {
 	            System.out.println("Sem conexão com a internet.");
+	           
 	        }
 	    }
 	}
