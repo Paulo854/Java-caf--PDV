@@ -1,4 +1,4 @@
-package teste;
+package conexao_controle;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;

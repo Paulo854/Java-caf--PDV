@@ -1,14 +1,14 @@
-package teste;
+package controladores;
 
 import javax.swing.JOptionPane;
 
-public class controlador {
-	
+public class controlador_operador {
+
 	private static int opN;
 	private static String nome;
 	private double money;
 	
-	public controlador() {
+	public controlador_operador() {
 		
 	}
 	public void setNumberOperador(int number) {
@@ -36,4 +36,5 @@ public class controlador {
 			this.money = dinheiro;
 		}
 	}
+	
 }

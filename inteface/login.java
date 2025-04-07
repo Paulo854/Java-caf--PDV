@@ -1,10 +1,17 @@
-package teste;
+package inteface;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.*;
+
+import conexao_controle.conect_internet;
+import conexao_controle.discord_entrada_caixa;
+import conexao_controle.discord_pedidos;
+import controladores.controlador_operador;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,8 +20,7 @@ import java.awt.image.*;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-
-public class inicio extends JFrame implements ActionListener{
+public class login extends JFrame implements ActionListener{
 	public JLabel date;
 	public JLabel logoIcon;
 	public JLabel lblLogin;
@@ -25,10 +31,10 @@ public class inicio extends JFrame implements ActionListener{
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
 	
-	public inicio() {
+	public login() {
 		
 		setUndecorated(true);
-		setBackground(Color.black);
+		
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         
@@ -182,14 +188,13 @@ public class inicio extends JFrame implements ActionListener{
 		// TODO Auto-generated method stub
 		
 	}
-        
-      
+
 	public static void main(String[] args) {
 		//imports internos
 		discord_pedidos discord_pedidos = new discord_pedidos();
-		conect internet = new conect();
-		controlador caixa = new controlador();
-		inicio iniciar = new inicio();
+		conect_internet internet = new conect_internet();
+		controlador_operador caixa = new controlador_operador();
+		login login = new login();
 		String cafe = null, 
 				leite = null, 
 				acucar = null, 
@@ -199,79 +204,15 @@ public class inicio extends JFrame implements ActionListener{
 		LocalDateTime agora = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 	    String horarioFormatado = agora.format(formatter);
-		iniciar.setVisible(true);
+		login.setVisible(true);
 		//Variáveis 
 		boolean closeSystem = false;
 		
 		while(closeSystem != true) {
 		
-		
-		
 		 if (internet.temConexao()) {
 	            //System.out.println("Conectado à internet.");
-			 int mat = 0;
-			 if(caixa.getNumberOperador() == 0) {
-	            mat =  Integer.parseInt(JOptionPane.showInputDialog("Matricula do operador?"));
-	    		
-	    		caixa.setNumberOperador(mat);
-	    		
-	    		if(caixa.getNumberOperador() == 375834) {
-	    			caixa.setNomeOperador("Paulo Victor Nascimento Cardoso");
-	    			double dinheiro = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor do caixa?"));
-	    			if(dinheiro == 100) {
-	    				int resp = JOptionPane.showConfirmDialog(null, "O caixa será aberto para:"+caixa.getNomeOperador()+"\ncom um valor de R$"+dinheiro+"0\n deseja confimar?");
-		    			if(resp == JOptionPane.YES_OPTION) {
-		    				discord_entrada_caixa.enviarEmbed("aberura de caixa", "Abertura de caixa valor aberto: **R$"+dinheiro+"0**", "Paulo Victor", horarioFormatado, caixa.getNomeOperador(), "https://discord.com/api/webhooks/1355352472733876402/4mmGgsPx3jTqbAN19JTEwPvEMl7xuOmMeQPINvnrArD1nlDLOUj4YFaexPIPcN-t6Xsq");
-		    				caixa.entradaCaixa(dinheiro);
-		    				JOptionPane.showMessageDialog(null, "Dados gravados\ncaixa aberto :)");
-		    				cafe = JOptionPane.showInputDialog("Qual será o seu café?");
-		    				leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
-		    				acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
-		    				if(cafe != null && leite != null && acucar != null) {
-		    				discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
-   							 closeSystem = true;
-		    				
-		    						
-		    				}else {
-		    				closeSystem = false;
-		    				}
-		    				
-		    				
-		    			}else if(resp == JOptionPane.NO_OPTION){
-		    				closeSystem = false;
-		    			}else if(resp == JOptionPane.CLOSED_OPTION) {
-		    				closeSystem = false;
-		    			}else if(resp == JOptionPane.CANCEL_OPTION) {
-		    				closeSystem = false;
-		    			}
-		    				
-		    				}else {
-		    					JOptionPane.showMessageDialog(null, "O lastro do caixa deve ser R$100,00");
-		    					closeSystem = false;
-		    				} 
-	    				}else {
-	    					JOptionPane.showMessageDialog(null, "Operador não encontrado");
-	    					closeSystem = false;
-	    				}
-	    		}else {
-	    			cafe = JOptionPane.showInputDialog("Qual será o seu café?");
-    				if(cafe != null) {
-    					leite = JOptionPane.showInputDialog("Deseja adcionar leite a sua bebida?");
-    					if(leite != null) {
-    						acucar = JOptionPane.showInputDialog("Deseja açúcar ou adoçante?");
-    						if(acucar != null) {
-    							discord_pedidos.enviarEmbed(title,cafe, leite, acucar, caixa.getNomeOperador(), link);
-    							 closeSystem = true;
-    						}else {
-    							closeSystem = false;
-    						}
-    					}else {
-    						closeSystem = false;
-    					}
-    				}else {
-    					closeSystem = false;
-    				}
-	    		}
+			 
 	        } else {
 	            System.out.println("Sem conexão com a internet.");
 	           
@@ -279,7 +220,4 @@ public class inicio extends JFrame implements ActionListener{
 	    }
 	}
 
-
-
-	
 }
