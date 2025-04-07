@@ -11,6 +11,7 @@ import conexao_controle.conect_internet;
 import conexao_controle.discord_entrada_caixa;
 import conexao_controle.discord_pedidos;
 import controladores.controlador_operador;
+import zona_teste.TesteConexaoMySQL;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,6 +42,8 @@ public class login extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon_bar.png"))); // chama imagem para aparecer na barra de tarefas
+
 
         
         JPanel panelBTN = new JPanel();
@@ -106,11 +109,12 @@ public class login extends JFrame implements ActionListener{
         txtLogin = new JTextField(20);
         txtLogin.setMaximumSize(new Dimension(200, 30)); // Limita o tamanho
         txtLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        
         // Painel interno com senha
         JPanel senhaPanel = new JPanel();
         senhaPanel.setLayout(new BoxLayout(senhaPanel, BoxLayout.X_AXIS));
         senhaPanel.setOpaque(false);
+        
         
         // Campo de senha
         lblSenha = new JLabel();
@@ -120,7 +124,18 @@ public class login extends JFrame implements ActionListener{
         txtSenha = new JPasswordField();
         txtSenha.setMaximumSize(new Dimension(200, 30)); // Limita o tamanho
         txtSenha.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        
+        JPanel botaoPanel = new JPanel();
+        botaoPanel.setOpaque(false);
+        botaoPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        
+        //botão
+        JButton btn_logar = new JButton("Entrar");
+        btn_logar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btn_logar.setPreferredSize(new Dimension(200, 30));
+        btn_logar.addActionListener(e -> validarLogin(txtLogin.getText(),txtSenha.getText()));
+        btn_logar.addActionListener(e -> txtLogin.setText(""));
+        btn_logar.addActionListener(e -> txtSenha.setText(""));
 
         // Adiciona aos painéis criados
         iconPanel.add(logoIcon);
@@ -129,8 +144,12 @@ public class login extends JFrame implements ActionListener{
         loginPanel.add(txtLogin);
         senhaPanel.add(lblSenha);
         senhaPanel.add(txtSenha);
+        botaoPanel.add(btn_logar);
+        infoPanel.add(Box.createVerticalStrut(40));
         infoPanel.add(loginPanel);
         infoPanel.add(senhaPanel);
+        infoPanel.add(Box.createVerticalStrut(10));
+        infoPanel.add(botaoPanel);
 
         // Adiciona ao centro com GridBagConstraints para centralizar
         centro.add(iconPanel, new GridBagConstraints());
@@ -140,7 +159,6 @@ public class login extends JFrame implements ActionListener{
         // Adiciona o painel central à janela
         add(centro, BorderLayout.CENTER);
 
-        setVisible(true);
         
         addWindowListener(new WindowAdapter() {
             @Override
@@ -159,6 +177,19 @@ public class login extends JFrame implements ActionListener{
 
         timer.start();
 	}
+	
+	private static void validarLogin(String matricula, String senha) {
+		try {
+			int login = Integer.parseInt(matricula);
+			int validaSenha = Integer.parseInt(senha);
+		if(login == 375834 && validaSenha == 1234) {
+			JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
+			System.exit(0);
+		}
+	}catch(NumberFormatException ex) {
+		JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+	}
+}
 	
 	private void solicitarSenhaParaFechar() {
         int senhaCorreta = 2399;
@@ -194,6 +225,8 @@ public class login extends JFrame implements ActionListener{
 		discord_pedidos discord_pedidos = new discord_pedidos();
 		conect_internet internet = new conect_internet();
 		controlador_operador caixa = new controlador_operador();
+		TesteConexaoMySQL banco = new TesteConexaoMySQL();
+		boolean conectado = banco.conect();
 		login login = new login();
 		String cafe = null, 
 				leite = null, 
@@ -204,20 +237,23 @@ public class login extends JFrame implements ActionListener{
 		LocalDateTime agora = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 	    String horarioFormatado = agora.format(formatter);
-		login.setVisible(true);
-		//Variáveis 
+		
+		//Variáveis     
 		boolean closeSystem = false;
-		
-		while(closeSystem != true) {
-		
-		 if (internet.temConexao()) {
-	            //System.out.println("Conectado à internet.");
-			 
-	        } else {
-	            System.out.println("Sem conexão com a internet.");
-	           
-	        }
+	if (internet.temConexao()) {
+		 System.out.println("Conectado à internet.");
+		 login.setVisible(true);
+		//if(conectado) {
+			
+		//}else {
+			//JOptionPane.showMessageDialog(null, "Sistema não conectado aos serviços do Java&café");
+			//System.exit(0);
+		//}	
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Sem conexão com a internet.");
+	        System.exit(0);
 	    }
 	}
+
 
 }
