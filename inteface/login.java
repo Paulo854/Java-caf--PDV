@@ -10,7 +10,10 @@ import javax.swing.*;
 import conexao_controle.conect_internet;
 import conexao_controle.discord_entrada_caixa;
 import conexao_controle.discord_pedidos;
+import controladores.controlador_login_system;
 import controladores.controlador_operador;
+import tratamento_excecao.EmptyFieldException;
+import tratamento_excecao.verificarCampo;
 import zona_teste.TesteConexaoMySQL;
 
 import java.awt.*;
@@ -31,6 +34,7 @@ public class login extends JFrame implements ActionListener{
     public Timer timer;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
+    public JFrame parentFrame; 
 	
 	public login() {
 		
@@ -38,7 +42,7 @@ public class login extends JFrame implements ActionListener{
 		
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
-        
+        setTitle("Java&Café");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -67,7 +71,7 @@ public class login extends JFrame implements ActionListener{
         panelDate.add(date);
 
         add(panelDate, BorderLayout.SOUTH);
-        
+             
         
         // Painel central que vai conter a logo e o txtLogin centralizados
         JPanel centro = new JPanel(new GridBagLayout()); // Centraliza conteúdo
@@ -101,9 +105,11 @@ public class login extends JFrame implements ActionListener{
         loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.X_AXIS));
         loginPanel.setOpaque(false);
         
+               
+        
         // Campo de login
         lblLogin = new JLabel();
-        lblLogin.setText("LOGIN: ");
+        lblLogin.setText("LOGIN:  ");
         lblLogin.setFont(new Font("Arial", Font.BOLD, 20));
 
         txtLogin = new JTextField(20);
@@ -133,9 +139,8 @@ public class login extends JFrame implements ActionListener{
         JButton btn_logar = new JButton("Entrar");
         btn_logar.setAlignmentX(Component.LEFT_ALIGNMENT);
         btn_logar.setPreferredSize(new Dimension(200, 30));
-        btn_logar.addActionListener(e -> validarLogin(txtLogin.getText(),txtSenha.getText()));
-        btn_logar.addActionListener(e -> txtLogin.setText(""));
-        btn_logar.addActionListener(e -> txtSenha.setText(""));
+        btn_logar.addActionListener(e -> validarLogin(txtLogin.getText(), txtSenha.getText()));
+
 
         // Adiciona aos painéis criados
         iconPanel.add(logoIcon);
@@ -178,13 +183,29 @@ public class login extends JFrame implements ActionListener{
         timer.start();
 	}
 	
-	private static void validarLogin(String matricula, String senha) {
+	private void validarLogin(String matricula, String senha) {
 		try {
 			int login = Integer.parseInt(matricula);
 			int validaSenha = Integer.parseInt(senha);
+			controlador_login_system setLogin = new controlador_login_system();
+			controlador_operador caixa = new controlador_operador();
+			vendas vender = new vendas();
 		if(login == 375834 && validaSenha == 1234) {
 			JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
-			System.exit(0);
+			setLogin.setNumberMatricula(login);
+			setLogin.setSenha(validaSenha);
+			JOptionPane.showMessageDialog(null, "Para inciar o sistema, precisamos dar entrada no operador");
+			int mat = Integer.parseInt(JOptionPane.showInputDialog("Informe a matricula do operador que irá usar esse PDV"));
+			caixa.setNumberOperador(mat);
+			double money = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor de lastro deste caixa?"));
+			caixa.entradaCaixa(money);
+			JOptionPane.showMessageDialog(null, "Todos os dados foram gravados, o caixa foi aberto e registrado no sistema Java&Café");
+			if(caixa.fechamentoCaixa() == money && caixa.getNumberOperador() == mat) {
+				vender.setVisible(true);
+				setVisible(false);
+			}
+		}else {
+			JOptionPane.showMessageDialog(null, "matricula ou senha incorreta");
 		}
 	}catch(NumberFormatException ex) {
 		JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -194,6 +215,7 @@ public class login extends JFrame implements ActionListener{
 	private void solicitarSenhaParaFechar() {
         int senhaCorreta = 2399;
         while (true) {
+        	
             String input = JOptionPane.showInputDialog("Para executar essa ação, informe a senha:");
             if (input == null) { 
                 return;
@@ -210,7 +232,7 @@ public class login extends JFrame implements ActionListener{
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
-            }
+            }            
         }
     }
 	
@@ -243,12 +265,12 @@ public class login extends JFrame implements ActionListener{
 	if (internet.temConexao()) {
 		 System.out.println("Conectado à internet.");
 		 login.setVisible(true);
-		//if(conectado) {
+		if(conectado) {
 			
-		//}else {
-			//JOptionPane.showMessageDialog(null, "Sistema não conectado aos serviços do Java&café");
-			//System.exit(0);
-		//}	
+		}else {
+			JOptionPane.showMessageDialog(null, "Sistema não conectado aos serviços do Java&café");
+		System.exit(0);
+		}	
 	    } else {
 	        JOptionPane.showMessageDialog(null, "Sem conexão com a internet.");
 	        System.exit(0);
