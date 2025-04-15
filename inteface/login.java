@@ -12,8 +12,6 @@ import conexao_controle.discord_entrada_caixa;
 import conexao_controle.discord_pedidos;
 import controladores.controlador_login_system;
 import controladores.controlador_operador;
-import tratamento_excecao.EmptyFieldException;
-import tratamento_excecao.verificarCampo;
 import zona_teste.TesteConexaoMySQL;
 
 import java.awt.*;
@@ -241,41 +239,4 @@ public class login extends JFrame implements ActionListener{
 		// TODO Auto-generated method stub
 		
 	}
-
-	public static void main(String[] args) {
-		//imports internos
-		discord_pedidos discord_pedidos = new discord_pedidos();
-		conect_internet internet = new conect_internet();
-		controlador_operador caixa = new controlador_operador();
-		TesteConexaoMySQL banco = new TesteConexaoMySQL();
-		boolean conectado = banco.conect();
-		login login = new login();
-		String cafe = null, 
-				leite = null, 
-				acucar = null, 
-				title = "Um pedido novo foi registrado", 
-				link = "https://discord.com/api/webhooks/1101930370070499398/xZ9Ef6KNeKyaM2zW1NbVFJ0sQixY_Z00UMBMv11fwD9jZlGqMBjXb9nZwHC5t49VRS36";
-		//Chama interface 
-		LocalDateTime agora = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-	    String horarioFormatado = agora.format(formatter);
-		
-		//Variáveis     
-		boolean closeSystem = false;
-	if (internet.temConexao()) {
-		 System.out.println("Conectado à internet.");
-		 login.setVisible(true);
-		if(conectado) {
-			
-		}else {
-			JOptionPane.showMessageDialog(null, "Sistema não conectado aos serviços do Java&café");
-		System.exit(0);
-		}	
-	    } else {
-	        JOptionPane.showMessageDialog(null, "Sem conexão com a internet.");
-	        System.exit(0);
-	    }
-	}
-
-
 }
