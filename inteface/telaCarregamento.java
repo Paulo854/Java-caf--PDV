@@ -151,7 +151,11 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
 
             System.out.println("Programa rodando normalmente...");
 
-        } catch (IOException e) {
+            while (true) {
+                Thread.sleep(1000);
+            }
+
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {
