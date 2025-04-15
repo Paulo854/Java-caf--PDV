@@ -8,9 +8,9 @@ import java.sql.SQLException;
 public class TesteConexaoMySQL {
 		
 			public boolean conect() {
-		        String url = "jdbc:mysql://brbgahf9wursozxo0tak-mysql.services.clever-cloud.com:3306/brbgahf9wursozxo0tak";
-		        String usuario = "uergyxu498ygdwjf";
-		        String senha = "8frxCjFJCP4xzJUEPssm";
+		        String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
+		        String usuario = "urrerpo6lwwp9trh";
+		        String senha = "EYWBqRaV6CD016CndFtR";
 
 		        try {
 		            Connection conexao = DriverManager.getConnection(url, usuario, senha);

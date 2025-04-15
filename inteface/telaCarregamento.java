@@ -43,7 +43,7 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
         JLabel logo = new JLabel();
         logo.setHorizontalAlignment(SwingConstants.CENTER);
         try {
-            BufferedImage imagem = ImageIO.read(getClass().getResource("logo1.png")); // Substitua pela sua logo
+            BufferedImage imagem = ImageIO.read(getClass().getResource("logo1.png")); 
             Image redimensionada = imagem.getScaledInstance(80, 80, Image.SCALE_SMOOTH);
             logo.setIcon(new ImageIcon(redimensionada));
         } catch (IOException e) {
@@ -86,6 +86,20 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
         SwingWorker<Void, String> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
+                // Verificação se o programa já está rodando
+            	System.out.println("Verificando lock...");
+            	File file = new File(System.getProperty("java.io.tmpdir") + "/program.lock");
+            	FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+            	FileLock lock = channel.tryLock();
+                System.out.println("Lock OK");
+
+                if (lock == null) {
+                    publish("<html><font face='Segoe UI Emoji'>⚠️ O programa já está em execução.</font></html>");
+                    Thread.sleep(10000); // Mostra a mensagem por 3 segundos
+                    System.exit(1);
+                }
+
+                // Mensagens a serem exibidas com emojis (usando HTML)
                 String[] mensagens = {
                     "<html><font face='Segoe UI Emoji'>🚀 Verificando conexão com o banco de dados...</font></html>",
                     "<html><font face='Segoe UI Emoji'>⚙️ Carregando configurações...</font></html>",
@@ -93,13 +107,16 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
                     "<html><font face='Segoe UI Emoji'>⚖️ Inicializando módulos...</font></html>",
                     "<html><font face='Segoe UI Emoji'>✅ Tudo pronto!</font></html>"
                 };
-
+                
+                System.out.println("Verificando conexões...");
                 // verifica cada etapa
                 for (int i = 0; i < mensagens.length; i++) {
                 	//verifica as conexões
                     if (i == 0 && (!conect.temConexao() || !banco.conect())) {
                         publish("<html><font face='Segoe UI Emoji'>❌ Erro ao conectar ao banco de dados.</font></html>");
-                        System.exit(0);
+                        System.out.println("Mensagem " + i);
+                        System.exit(1);
+                        
                         break; // Interrompe o loop se não houver conexão
                     }
 
@@ -107,7 +124,9 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
                     Thread.sleep(1000); // Simulando o tempo de cada etapa
                     barraProgresso.setValue((i + 1) * 100 / mensagens.length);
                 }
+                System.out.println("Conexão OK");
 
+                
                 return null;
             }
 
@@ -130,8 +149,9 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
         };
 
         worker.execute();
+      
     }
-
+        
     public void fechar() {
         setVisible(false);
         dispose();
@@ -139,31 +159,5 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
 
     public static void main(String[] args) {
         new telaCarregamento();
-        try {
-            File file = new File("program.lock");
-            channel = new RandomAccessFile(file, "rw").getChannel();
-            lock = channel.tryLock();
-
-            if (lock == null) {
-                System.out.println("O programa já está em execução.");
-                System.exit(1);
-            }
-
-            System.out.println("Programa rodando normalmente...");
-
-            while (true) {
-                Thread.sleep(1000);
-            }
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (lock != null) lock.release();
-                if (channel != null) channel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
