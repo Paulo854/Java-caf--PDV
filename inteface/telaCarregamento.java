@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.*;
 import java.nio.channels.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -23,6 +25,7 @@ import javax.swing.SwingWorker;
 import javax.swing.JWindow;
 
 import conexao_controle.conect_internet;
+import conexao_controle.discord_erro_pdv;
 import zona_teste.TesteConexaoMySQL;
 
 
@@ -113,7 +116,13 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
                 for (int i = 0; i < mensagens.length; i++) {
                 	//verifica as conexões
                     if (i == 0 && (!conect.temConexao() || !banco.conect())) {
+                    	discord_erro_pdv erroDiscord = new discord_erro_pdv();
+                    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                    	LocalDateTime agora = LocalDateTime.now();
+                        String data = agora.format(formatter);
                         publish("<html><font face='Segoe UI Emoji'>❌ Erro ao conectar ao banco de dados.</font></html>");
+                        erroDiscord.enviarEmbed("Iniciação do PDV","O PDV está sofrendo dificulade para se conectar ao serviços do Java&Café", getClass(), "Média", data, "Segurança PDVs", "https://discord.com/api/webhooks/1361852916377583756/fkqRCJIayPCiVB69CvKTCqM6k8xCuNJA4P5fPmnICrnvcCLXEfwJnKzp6a3Eg4qkKa_i");
+                        Thread.sleep(10000);
                         System.out.println("Mensagem " + i);
                         System.exit(1);
                         
