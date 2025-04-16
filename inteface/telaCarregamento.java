@@ -121,7 +121,7 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
                     	LocalDateTime agora = LocalDateTime.now();
                         String data = agora.format(formatter);
                         publish("<html><font face='Segoe UI Emoji'>❌ Erro ao conectar ao banco de dados.</font></html>");
-                        erroDiscord.enviarEmbed("Iniciação do PDV","O PDV está sofrendo dificulade para se conectar ao serviços do Java&Café", getClass(), "Média", data, "Segurança PDVs", "https://discord.com/api/webhooks/1361852916377583756/fkqRCJIayPCiVB69CvKTCqM6k8xCuNJA4P5fPmnICrnvcCLXEfwJnKzp6a3Eg4qkKa_i");
+                        erroDiscord.enviarEmbed("Iniciação do PDV","O PDV está sofrendo dificulade para se conectar ao serviços do Java&Café", "telaCarregamento()", "Média", data, "Segurança PDVs", "https://discord.com/api/webhooks/1361852916377583756/fkqRCJIayPCiVB69CvKTCqM6k8xCuNJA4P5fPmnICrnvcCLXEfwJnKzp6a3Eg4qkKa_i");
                         Thread.sleep(10000);
                         System.out.println("Mensagem " + i);
                         System.exit(1);
