@@ -22,11 +22,13 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
+import conect_banco.TesteConexaoMySQL;
+
 import javax.swing.JWindow;
 
 import conexao_controle.conect_internet;
 import conexao_controle.discord_erro_pdv;
-import zona_teste.TesteConexaoMySQL;
 
 
 public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame

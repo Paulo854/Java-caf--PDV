@@ -7,12 +7,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 
+import conect_banco.TesteConexaoMySQL;
+import conect_banco.valida_login;
 import conexao_controle.conect_internet;
 import conexao_controle.discord_entrada_caixa;
 import conexao_controle.discord_pedidos;
 import controladores.controlador_login_system;
 import controladores.controlador_operador;
-import zona_teste.TesteConexaoMySQL;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -185,33 +186,26 @@ public class login extends JFrame implements ActionListener{
 		try {
 			int login = Integer.parseInt(matricula);
 			int validaSenha = Integer.parseInt(senha);
-			controlador_login_system setLogin = new controlador_login_system();
-			controlador_operador caixa = new controlador_operador();
+			valida_login validaBanco = new valida_login();
 			vendas vender = new vendas();
-		if(login == 375834 && validaSenha == 1234) {
-			JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
-			setLogin.setNumberMatricula(login);
-			setLogin.setSenha(validaSenha);
-			JOptionPane.showMessageDialog(null, "Para inciar o sistema, precisamos dar entrada no operador");
-			int mat = Integer.parseInt(JOptionPane.showInputDialog("Informe a matricula do operador que irá usar esse PDV"));
-			caixa.setNumberOperador(mat);
-			double money = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor de lastro deste caixa?"));
-			caixa.entradaCaixa(money);
-			JOptionPane.showMessageDialog(null, "Todos os dados foram gravados, o caixa foi aberto e registrado no sistema Java&Café");
-			if(caixa.fechamentoCaixa() == money && caixa.getNumberOperador() == mat) {
+			int resultado = validaBanco.verificaLogin(login, validaSenha);
+			if(resultado == 1) {
+				JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
 				vender.setVisible(true);
 				setVisible(false);
+			}else if(resultado == 0) {
+				JOptionPane.showMessageDialog(null, "Os dados informados estão incorretos");
+			}else {
+				JOptionPane.showMessageDialog(null, "Erro ao se conectar ao banco de dados");
 			}
-		}else {
-			JOptionPane.showMessageDialog(null, "matricula ou senha incorreta");
-		}
+			
 	}catch(NumberFormatException ex) {
 		JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
 	}
 }
 	
-	private void solicitarSenhaParaFechar() {
-        int senhaCorreta = 2399;
+	private void solicitarSenhaParaFechar() {;
+        valida_login validaBanco = new valida_login();
         while (true) {
         	
             String input = JOptionPane.showInputDialog("Para executar essa ação, informe a senha:");
@@ -221,11 +215,14 @@ public class login extends JFrame implements ActionListener{
 
             try {
                 int senha = Integer.parseInt(input);
-                if (senha == senhaCorreta) {
+                int resultado = validaBanco.fecharPDV(senha);
+                if (resultado == 1) {
+                	 LocalDateTime agora = LocalDateTime.now();
+                	discord_entrada_caixa.enviarEmbed("Sistema fechado", "Uma filial fechou o PDV", "**"+validaBanco.getNome(senha)+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1358563763598393356/O5REd2sYuHPZwmL_tIIBadk5pKYk0Uj5QMwUA0sH2LcIiybc1LvicLNHOBOOj9oNI3Vu");
                     System.exit(0);
                 } else {
                 	 LocalDateTime agora = LocalDateTime.now();
-                	discord_entrada_caixa.enviarEmbed("Tentativa de fechar aplicação", "indetificamos que uma filial tentou fechar o PDV", "foi identificado uma senha: **"+senha+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1355352472733876402/4mmGgsPx3jTqbAN19JTEwPvEMl7xuOmMeQPINvnrArD1nlDLOUj4YFaexPIPcN-t6Xsq");
+                	discord_entrada_caixa.enviarEmbed("Tentativa de fechar aplicação", "indetificamos que uma filial tentou fechar o PDV", "foi identificado uma senha: **"+senha+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1358563763598393356/O5REd2sYuHPZwmL_tIIBadk5pKYk0Uj5QMwUA0sH2LcIiybc1LvicLNHOBOOj9oNI3Vu");
                     JOptionPane.showMessageDialog(null, "Senha incorreta!", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
