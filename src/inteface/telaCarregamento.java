@@ -42,6 +42,7 @@ public class telaCarregamento extends JWindow { // Extende JWindow ou JFrame
 
     public telaCarregamento() {
         JPanel painel = new JPanel(new BorderLayout());
+        setAlwaysOnTop(true);
         painel.setBackground(new Color(40, 40, 40)); // fundo escuro
 
         // Logo no centro

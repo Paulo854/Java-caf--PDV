@@ -1,8 +1,13 @@
 package conect_banco;
 
 import javax.swing.*;
+
+import conexao_controle.discord_erro_pdv;
+
 import java.awt.*;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class valida_login {	
 	
@@ -79,7 +84,7 @@ public class valida_login {
                     nome = resultado.getString("nome");
                     return nome;
                 } else {
-                    System.out.println("Funcionário não encontrado.");
+                	JOptionPane.showMessageDialog(null, "Funcionário não encontrado", "error", JOptionPane.ERROR_MESSAGE);
                 }
 
             } catch (SQLException e) {
@@ -108,7 +113,7 @@ public class valida_login {
                     nome = resultado.getString("nome");
                     return nome;
                 } else {
-                    System.out.println("Funcionário não encontrado.");
+                	JOptionPane.showMessageDialog(null, "Funcionário não encontrado", "error", JOptionPane.ERROR_MESSAGE);
                 }
 
             } catch (SQLException e) {
@@ -138,7 +143,7 @@ public class valida_login {
                 	filial = resultado.getString("filial");
                     return filial;
                 } else {
-                    System.out.println("Funcionário não encontrado.");
+                	JOptionPane.showMessageDialog(null, "Filial não localizada", "error", JOptionPane.ERROR_MESSAGE);
                 }
 
             } catch (SQLException e) {
@@ -186,6 +191,11 @@ public class valida_login {
                     if (linhasAfetadas > 0) {
                         System.out.print("Este PDV está registrado no Java&Café");
                     } else {
+                    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                    	LocalDateTime agora = LocalDateTime.now();
+                        String data = agora.format(formatter);
+                    	discord_erro_pdv discordErro = new discord_erro_pdv();
+                    	discordErro.enviarEmbed("Conexão do PDV","o PDV não está sendo registrado no banco de dados", "valida_login() -> setPDV()", "Alta", data, "Segurança PDVs", "https://discord.com/api/webhooks/1361852916377583756/fkqRCJIayPCiVB69CvKTCqM6k8xCuNJA4P5fPmnICrnvcCLXEfwJnKzp6a3Eg4qkKa_i");
                         System.out.println("Falha ao inserir o registro.");
                     }
                 }

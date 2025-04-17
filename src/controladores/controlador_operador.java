@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 public class controlador_operador {
 
-	private static int opN;
+	private static int opN = 0;
 	private static String nome = null;
 	private double money;
 	

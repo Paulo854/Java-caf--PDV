@@ -181,44 +181,67 @@ public class login extends JFrame implements ActionListener{
 	}
 	
 	private void validarLogin(String mat, String senha) {
-		try {
-			int login = Integer.parseInt(mat);
-			int validaSenha = Integer.parseInt(senha);
-			valida_login validaBanco = new valida_login();
-			controlador_operador operador = new controlador_operador();
-			vendas vender = new vendas();
-			int resultado = validaBanco.verificaLogin(login, validaSenha);
-			if(resultado == 1) {
-				JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
-				int matricula = Integer.parseInt(JOptionPane.showInputDialog("Qual a matricula do operador?"));
-				double money = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor de lastro do caixa?"));
-				
-				
-				operador.setNomeOperador(validaBanco.getNomeFuncionario(matricula));
-				operador.setNumberOperador(matricula);
-				
-				String filial= validaBanco.getFilial(matricula);				
-				
-				
-				int result = JOptionPane.showConfirmDialog(null, "Este PDV será aberto para " + operador.getNomeOperador() + " com um valor de: R$" + money + "0");
+	    try {
+	        int login = Integer.parseInt(mat);
+	        int validaSenha = Integer.parseInt(senha);
+	        valida_login validaBanco = new valida_login();
+	        controlador_operador operador = new controlador_operador();
+	        vendas vender = new vendas();
+	        String filial;
+	        int matricula;
+	        double money;
 
-				if (result == JOptionPane.OK_OPTION) {
-					
-					validaBanco.setPDV(operador.getNomeOperador(), filial, money, operador.getNumberOperador());
-				    vender.setVisible(true);
-				    setVisible(false);
-				}
-				
-			}else if(resultado == 0) {
-				JOptionPane.showMessageDialog(null, "Os dados informados estão incorretos");
-			}else {
-				JOptionPane.showMessageDialog(null, "Erro ao se conectar ao banco de dados");
-			}
-			
-	}catch(NumberFormatException ex) {
-		JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        int resultado = validaBanco.verificaLogin(login, validaSenha);
+
+	        if (resultado == 1) {
+	            JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
+
+	            while (true) {
+	                try {
+	                    matricula = Integer.parseInt(JOptionPane.showInputDialog("Qual a matrícula do operador?"));
+	                    money = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor de lastro do caixa?"));
+
+	                    String nomeOperador = validaBanco.getNomeFuncionario(matricula);
+	                    filial = validaBanco.getFilial(matricula);
+
+	                    if (nomeOperador != null && matricula != 0) {
+	                        operador.setNomeOperador(nomeOperador);
+	                        operador.setNumberOperador(matricula);
+
+	                        int result = JOptionPane.showConfirmDialog(null,
+	                                "Este PDV será aberto para " + nomeOperador + " com um valor de: R$" + String.format("%.2f", money),
+	                                "Confirmação",
+	                                JOptionPane.OK_CANCEL_OPTION);
+
+	                        if (result == JOptionPane.OK_OPTION) {
+	                            validaBanco.setPDV(nomeOperador, filial, money, matricula);
+	                            vender.setVisible(true);
+	                            setVisible(false);
+	                        } else {
+	                            JOptionPane.showMessageDialog(null, "A operação foi cancelada", "Cancelado", JOptionPane.WARNING_MESSAGE);
+	                        }
+	                        break;
+	                    } else {
+	                        JOptionPane.showMessageDialog(null, "Matrícula inválida. Tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+	                    }
+	                } catch (NumberFormatException e) {
+	                    JOptionPane.showMessageDialog(null, "Digite valores válidos!", "Erro", JOptionPane.ERROR_MESSAGE);
+	                }
+	            }
+
+	        } else if (resultado == 0) {
+	            JOptionPane.showMessageDialog(null, "Os dados informados estão incorretos");
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Erro ao se conectar ao banco de dados");
+	        }
+
+	    } catch (NumberFormatException ex) {
+	        JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+	    } catch (Exception e) {
+	        JOptionPane.showMessageDialog(null, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+	    }
 	}
-}
+
 	
 	private void solicitarSenhaParaFechar() {;
         valida_login validaBanco = new valida_login();
