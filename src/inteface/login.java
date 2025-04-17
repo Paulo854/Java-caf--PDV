@@ -16,8 +16,6 @@ import controladores.controlador_login_system;
 import controladores.controlador_operador;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.ImageIO;
@@ -182,17 +180,35 @@ public class login extends JFrame implements ActionListener{
         timer.start();
 	}
 	
-	private void validarLogin(String matricula, String senha) {
+	private void validarLogin(String mat, String senha) {
 		try {
-			int login = Integer.parseInt(matricula);
+			int login = Integer.parseInt(mat);
 			int validaSenha = Integer.parseInt(senha);
 			valida_login validaBanco = new valida_login();
+			controlador_operador operador = new controlador_operador();
 			vendas vender = new vendas();
 			int resultado = validaBanco.verificaLogin(login, validaSenha);
 			if(resultado == 1) {
 				JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
-				vender.setVisible(true);
-				setVisible(false);
+				int matricula = Integer.parseInt(JOptionPane.showInputDialog("Qual a matricula do operador?"));
+				double money = Double.parseDouble(JOptionPane.showInputDialog("Qual o valor de lastro do caixa?"));
+				
+				
+				operador.setNomeOperador(validaBanco.getNomeFuncionario(matricula));
+				operador.setNumberOperador(matricula);
+				
+				String filial= validaBanco.getFilial(matricula);				
+				
+				
+				int result = JOptionPane.showConfirmDialog(null, "Este PDV será aberto para " + operador.getNomeOperador() + " com um valor de: R$" + money + "0");
+
+				if (result == JOptionPane.OK_OPTION) {
+					
+					validaBanco.setPDV(operador.getNomeOperador(), filial, money, operador.getNumberOperador());
+				    vender.setVisible(true);
+				    setVisible(false);
+				}
+				
 			}else if(resultado == 0) {
 				JOptionPane.showMessageDialog(null, "Os dados informados estão incorretos");
 			}else {
@@ -206,6 +222,7 @@ public class login extends JFrame implements ActionListener{
 	
 	private void solicitarSenhaParaFechar() {;
         valida_login validaBanco = new valida_login();
+        controlador_operador operador = new controlador_operador();
         while (true) {
         	
             String input = JOptionPane.showInputDialog("Para executar essa ação, informe a senha:");
@@ -218,7 +235,10 @@ public class login extends JFrame implements ActionListener{
                 int resultado = validaBanco.fecharPDV(senha);
                 if (resultado == 1) {
                 	 LocalDateTime agora = LocalDateTime.now();
-                	discord_entrada_caixa.enviarEmbed("Sistema fechado", "Uma filial fechou o PDV", "**"+validaBanco.getNome(senha)+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1358563763598393356/O5REd2sYuHPZwmL_tIIBadk5pKYk0Uj5QMwUA0sH2LcIiybc1LvicLNHOBOOj9oNI3Vu");
+                	discord_entrada_caixa.enviarEmbed("Sistema fechado", "Uma filial fechou o PDV", "**"+validaBanco.getNomeGerencia(senha)+"**", agora.format(formatter), "Segurança PDVs", "https://discord.com/api/webhooks/1358563763598393356/O5REd2sYuHPZwmL_tIIBadk5pKYk0Uj5QMwUA0sH2LcIiybc1LvicLNHOBOOj9oNI3Vu");
+                	if(operador.getNomeOperador() != null) {
+                		validaBanco.deletarPDV(operador.getNumberOperador());
+                	}
                     System.exit(0);
                 } else {
                 	 LocalDateTime agora = LocalDateTime.now();
@@ -236,4 +256,5 @@ public class login extends JFrame implements ActionListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
 }

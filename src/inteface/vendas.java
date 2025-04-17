@@ -6,6 +6,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
+import conect_banco.valida_login;
+import controladores.controlador_operador;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public class vendas extends JFrame {
 
     public vendas() {
@@ -144,6 +150,15 @@ public class vendas extends JFrame {
         for (int i = 0; i < tabela.getColumnCount(); i++) {
             tabela.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                valida_login banco = new valida_login();
+                controlador_operador operador = new controlador_operador();
+                banco.deletarPDV(operador.getNumberOperador());
+                System.exit(0);
+            }
+        });
     }
-
 }
