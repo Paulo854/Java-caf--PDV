@@ -2,19 +2,19 @@ package controladores;
 
 public class controlador_login_system {
 
-	private static int matricula = 0;
-	private static int senha = 0;
+	private int matricula;
+	private int senha;
 	
 	public controlador_login_system() {	
 		
 	}
-	public void setNumberMatricula(int number) {
-		this.matricula = number;
+	public void setNumberMatricula(int matricula) {
+		this.matricula = matricula;
 	}
 	public int getMatricula() {
 		return this.matricula;
 	}
-	public void setSenha(int number) {
+	public void setSenha(int senha) {
 		this.senha = senha;
 	}
 	public int getSenha() {

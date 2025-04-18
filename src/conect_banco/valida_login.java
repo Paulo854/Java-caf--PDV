@@ -5,11 +5,14 @@ import javax.swing.*;
 import conexao_controle.discord_erro_pdv;
 
 import java.awt.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class valida_login {	
+	public String ipPC;
 	
 	public int verificaLogin(int matricula, int senhaLogin) {
         String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
@@ -93,6 +96,35 @@ public class valida_login {
             
             return nome;
     }
+        public String getNomeGerenciaMatricula(int matricula) {
+            String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
+            String usuario = "urrerpo6lwwp9trh";
+            String senha = "EYWBqRaV6CD016CndFtR";
+
+            String sql = "SELECT nome FROM funcionario WHERE matricula = ? AND gerencia = 1";
+            
+            String nome = null;
+
+            try (Connection conexao = DriverManager.getConnection(url, usuario, senha);
+                 PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            	 stmt.setInt(1, matricula);
+
+                ResultSet resultado = stmt.executeQuery();
+
+                if (resultado.next()) {
+                    nome = resultado.getString("nome");
+                    return nome;
+                } else {
+                	JOptionPane.showMessageDialog(null, "Funcionário não encontrado", "error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            
+            return nome;
+    }
         public String getNomeFuncionario(int matricula) {
             String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
             String usuario = "urrerpo6lwwp9trh";
@@ -123,14 +155,14 @@ public class valida_login {
             return nome;
     }
         
-        public String getFilial(int matricula) {
+        public int getFilial(int matricula) {
             String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
             String usuario = "urrerpo6lwwp9trh";
             String senha = "EYWBqRaV6CD016CndFtR";
 
             String sql = "SELECT filial FROM funcionario WHERE matricula = ?";
             
-            String filial = null;
+            int filial = 0;
 
             try (Connection conexao = DriverManager.getConnection(url, usuario, senha);
                  PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -140,7 +172,7 @@ public class valida_login {
                 ResultSet resultado = stmt.executeQuery();
 
                 if (resultado.next()) {
-                	filial = resultado.getString("filial");
+                	filial = resultado.getInt("filial");
                     return filial;
                 } else {
                 	JOptionPane.showMessageDialog(null, "Filial não localizada", "error", JOptionPane.ERROR_MESSAGE);
@@ -152,8 +184,37 @@ public class valida_login {
             
             return filial;
     }
+        public int getNumberGerenciaPDV(int matricula) {
+            String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
+            String usuario = "urrerpo6lwwp9trh";
+            String senha = "EYWBqRaV6CD016CndFtR";
+
+            String sql = "SELECT matriculaGerencia FROM caixas_abertos WHERE matricula = ?";
+            
+            int matriculaGerencia = 0;
+
+            try (Connection conexao = DriverManager.getConnection(url, usuario, senha);
+                 PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            	 stmt.setInt(1, matricula);
+
+                ResultSet resultado = stmt.executeQuery();
+
+                if (resultado.next()) {
+                	matriculaGerencia = resultado.getInt("matriculaGerencia");
+                    return matriculaGerencia;
+                } else {
+                	JOptionPane.showMessageDialog(null, "Membro gerencial não localizado", "error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            
+            return matriculaGerencia;
+    }
         
-        public void setPDV(String nomeFuncionario, String filial, double money, int matricula) {
+        public void setPDV(String nomeFuncionario, int filial, double money, int matricula, int matriculaGerencia) {
             String url = "jdbc:mysql://boen8rx43tg50tzvfbdx-mysql.services.clever-cloud.com:3306/boen8rx43tg50tzvfbdx";
             String usuario = "urrerpo6lwwp9trh";
             String senha = "EYWBqRaV6CD016CndFtR";
@@ -176,15 +237,28 @@ public class valida_login {
                     }
                 }
 
-                // Agora, faz o INSERT com o novo PDV
-                String sql = "INSERT INTO caixas_abertos (funcionario, filial, qtd_dinheiro, pdv, matricula) VALUES (?, ?, ?, ?, ?)";
+               
+                String sql = "INSERT INTO caixas_abertos (funcionario, filial, qtd_dinheiro, pdv, matricula, ip, matriculaGerencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+                
+                try {
+                    InetAddress ip = InetAddress.getLocalHost();
+                    ipPC = ip.getHostAddress();
+                } catch (UnknownHostException e) {
+                    System.err.println("Não foi possível obter o endereço IP.");
+                    e.printStackTrace();
+                }
                 try (PreparedStatement stmtInsercao = conexao.prepareStatement(sql)) {
+                	
+                	
+                	
                     stmtInsercao.setString(1, nomeFuncionario);
-                    stmtInsercao.setString(2, filial);
+                    stmtInsercao.setInt(2, filial);
                     stmtInsercao.setDouble(3, money);
                     stmtInsercao.setInt(4, novoPDV);
                     stmtInsercao.setInt(5, matricula);
+                    stmtInsercao.setString(6,  ipPC);
+                    stmtInsercao.setInt(7, matriculaGerencia);
 
                     int linhasAfetadas = stmtInsercao.executeUpdate();
 

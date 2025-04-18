@@ -11,6 +11,7 @@ import conect_banco.TesteConexaoMySQL;
 import conect_banco.valida_login;
 import conexao_controle.conect_internet;
 import conexao_controle.discord_entrada_caixa;
+import conexao_controle.discord_erro_pdv;
 import conexao_controle.discord_pedidos;
 import controladores.controlador_login_system;
 import controladores.controlador_operador;
@@ -29,6 +30,7 @@ public class login extends JFrame implements ActionListener{
 	public JLabel lblSenha;
 	public JPasswordField txtSenha;
     public Timer timer;
+    public static int matriculaGerencia, senhaGerencia; 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     public discord_entrada_caixa discord_entrada = new discord_entrada_caixa();
     public JFrame parentFrame; 
@@ -181,17 +183,21 @@ public class login extends JFrame implements ActionListener{
 	}
 	
 	private void validarLogin(String mat, String senha) {
-	    try {
-	        int login = Integer.parseInt(mat);
-	        int validaSenha = Integer.parseInt(senha);
+	    try {	        
+	        matriculaGerencia = Integer.parseInt(mat); 
+	        senhaGerencia = Integer.parseInt(senha); 
 	        valida_login validaBanco = new valida_login();
 	        controlador_operador operador = new controlador_operador();
+	        discord_entrada_caixa entradaCaixa = new discord_entrada_caixa();
 	        vendas vender = new vendas();
-	        String filial;
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        	LocalDateTime agora = LocalDateTime.now();
+            String data = agora.format(formatter);
+	        int filial;
 	        int matricula;
 	        double money;
 
-	        int resultado = validaBanco.verificaLogin(login, validaSenha);
+	        int resultado = validaBanco.verificaLogin(matriculaGerencia, senhaGerencia);
 
 	        if (resultado == 1) {
 	            JOptionPane.showMessageDialog(null, "Os dados de liberação foram gravados");
@@ -214,9 +220,21 @@ public class login extends JFrame implements ActionListener{
 	                                JOptionPane.OK_CANCEL_OPTION);
 
 	                        if (result == JOptionPane.OK_OPTION) {
-	                            validaBanco.setPDV(nomeOperador, filial, money, matricula);
-	                            vender.setVisible(true);
-	                            setVisible(false);
+	                            validaBanco.setPDV(nomeOperador, filial, money, matricula, matriculaGerencia);
+	                            
+	                          if(filial == 1001) {
+	                            	entradaCaixa.enviarEmbed("Abertura caixa", "Caixa da filial do(a) Paulista aberto valor **R$"+money+"0**", validaBanco.getNomeGerenciaMatricula(validaBanco.getNumberGerenciaPDV(operador.getNumberOperador())), data, validaBanco.getNomeFuncionario(matricula), "https://discord.com/api/webhooks/1362588815562379466/5IwbPRaz2aDUryugBvJS5F3EwTDFvQfzWl5Lt7PlkNuVCNwMAIOgvvqdq1EQHl8OgQL7");
+	                            	vender.setVisible(true);
+		                            setVisible(false);
+	                          }else if(filial == 1002) {
+	                            	entradaCaixa.enviarEmbed("Abertura caixa", "Caixa da filial do(a) Jd Ângela aberto valor **R$"+money+"0**", validaBanco.getNomeGerenciaMatricula(validaBanco.getNumberGerenciaPDV(operador.getNumberOperador())), data, validaBanco.getNomeFuncionario(matricula), "https://discord.com/api/webhooks/1362589263077576926/CNkZrr49Q0fzPECxO1eYPXohrCHHr02F_1X6_tX_62Gc7DAbN4KRvxsAQKZ44BgJLrjZ");
+	                            	vender.setVisible(true);
+		                            setVisible(false);
+	                          }else if(filial == 1003) {
+	                            	entradaCaixa.enviarEmbed("Abertura caixa", "Caixa da filial do(a) Liberdade aberto valor **R$"+money+"0**", validaBanco.getNomeGerenciaMatricula(validaBanco.getNumberGerenciaPDV(operador.getNumberOperador())), data, validaBanco.getNomeFuncionario(matricula), "https://discord.com/api/webhooks/1362589310129405973/dDY4uwLyqbBH2BEdAXRuLj3ejG4B1uDvSPPG_N35WUeQXbUy2qAr281jxhYE0PSByWn8");
+	                            	vender.setVisible(true);
+		                            setVisible(false);
+	                          }
 	                        } else {
 	                            JOptionPane.showMessageDialog(null, "A operação foi cancelada", "Cancelado", JOptionPane.WARNING_MESSAGE);
 	                        }
@@ -236,8 +254,19 @@ public class login extends JFrame implements ActionListener{
 	        }
 
 	    } catch (NumberFormatException ex) {
+
 	        JOptionPane.showMessageDialog(null, "Digite um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        
 	    } catch (Exception e) {
+	    	discord_erro_pdv erroDiscord = new discord_erro_pdv();
+	    	 String tipoErro = e.getClass().getSimpleName();
+	    	 String mensagemErro = e.getMessage();
+	    	 String resumo = "Erro [" + tipoErro + "]: " + mensagemErro;
+	    		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            	LocalDateTime agora = LocalDateTime.now();
+                String data = agora.format(formatter);
+	    	 erroDiscord.enviarEmbed("Erro desconhecido",resumo, "login() -> validarLogin()", "Alta", data, "Segurança PDVs", "https://discord.com/api/webhooks/1361852916377583756/fkqRCJIayPCiVB69CvKTCqM6k8xCuNJA4P5fPmnICrnvcCLXEfwJnKzp6a3Eg4qkKa_i");
+	    	
 	        JOptionPane.showMessageDialog(null, "Erro inesperado: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
